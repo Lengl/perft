@@ -15,8 +15,11 @@ public class Square {
             A2 = new Square(38), B2 = new Square(37), C2 = new Square(36), D2 = new Square(35), E2 = new Square(34), F2 = new Square(33), G2 = new Square(32), H2 = new Square(31),
             A1 = new Square(28), B1 = new Square(27), C1 = new Square(26), D1 = new Square(25), E1 = new Square(24), F1 = new Square(23), G1 = new Square(22), H1 = new Square(21);
 
+    public static Square invalid() {
+        return new Square(0);
+    }
 
-    public final byte value;
+    public byte value;
 
     public Square(int value) {
         this.value = (byte) value;
@@ -25,4 +28,5 @@ public class Square {
     public boolean isValid() {
         return value >= H1.value && value <= A8.value;
     }
+
 }

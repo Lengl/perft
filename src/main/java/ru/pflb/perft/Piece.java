@@ -8,27 +8,29 @@ import static ru.pflb.perft.Color.WHITE;
  */
 public enum Piece {
 
-    W_KING((byte)0, WHITE),
-    B_KING((byte)0, BLACK),
-    W_BISHOP((byte)1, WHITE),
-    B_BISHOP((byte)1, BLACK),
-    W_ROOK((byte)2, WHITE),
-    B_ROOK((byte)2, BLACK),
-    W_QUEEN((byte)3, WHITE),
-    B_QUEEN((byte)3, BLACK),
-    W_KNIGHT((byte)4, WHITE),
-    B_KNIGHT((byte)4, BLACK),
-    OUT((byte)-1),
-    EMP((byte)0);
+    W_KING((byte)0, WHITE, 'K'),
+    B_KING((byte)0, BLACK, 'k'),
+    W_BISHOP((byte)1, WHITE, 'B'),
+    B_BISHOP((byte)1, BLACK, 'b'),
+    W_ROOK((byte)2, WHITE, 'R'),
+    B_ROOK((byte)2, BLACK, 'r'),
+    W_QUEEN((byte)3, WHITE, 'Q'),
+    B_QUEEN((byte)3, BLACK, 'q'),
+    W_KNIGHT((byte)4, WHITE, 'N'),
+    B_KNIGHT((byte)4, BLACK, 'n'),
+    OUT((byte)-1, '-'),
+    EMP((byte)0, ' ');
 
     public final byte code;
+    public final char name;
 
-    Piece(byte pieceType, Color color) {
-        this((byte)(color.color * 6 + pieceType + 1));
+    Piece(byte pieceType, Color color, char name) {
+        this((byte)(color.color * 6 + pieceType + 1), name);
     }
 
-    Piece(byte code) {
+    Piece(byte code, char name) {
         this.code = code;
+        this.name = name;
     }
 
     public Color getColor() {

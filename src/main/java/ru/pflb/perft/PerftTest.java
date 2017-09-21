@@ -15,7 +15,7 @@ public class PerftTest {
     public void shortPerftTest() {
         long millis = System.currentTimeMillis();
         Board board = new Board("4kb2/8/8/8/8/8/8/4K2R w - -");
-        int movesNb = Perft.search(board, 7);
+        long movesNb = Perft.search(board, 7);
         System.out.println(System.currentTimeMillis() - millis);
 
         assertThat(movesNb).isEqualTo(104744354);
@@ -28,7 +28,7 @@ public class PerftTest {
     public void longPerftTest() {
         long millis = System.currentTimeMillis();
         Board board = new Board("r3kb1r/8/8/4K3/8/8/8/2BQ1B2 w - -");
-        int movesNb = Perft.search(board, 5);
+        long movesNb = Perft.search(board, 5);
         System.out.println(System.currentTimeMillis()-millis);
 
         assertThat(movesNb).isEqualTo(23250211);
