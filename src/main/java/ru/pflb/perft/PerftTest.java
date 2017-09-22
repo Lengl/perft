@@ -15,6 +15,7 @@ public class PerftTest {
     public void shortPerftTest() {
         long millis = System.currentTimeMillis();
         Board board = new Board("4kb2/8/8/8/8/8/8/4K2R w - -");
+        System.out.println(board);
         long movesNb = Perft.search(board, 7);
         System.out.println(System.currentTimeMillis() - millis);
 

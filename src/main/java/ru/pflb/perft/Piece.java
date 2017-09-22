@@ -8,18 +8,30 @@ import static ru.pflb.perft.Color.WHITE;
  */
 public enum Piece {
 
+    // 1
     W_KING((byte)0, WHITE, 'K'),
+    // 7
     B_KING((byte)0, BLACK, 'k'),
+    // 2
     W_BISHOP((byte)1, WHITE, 'B'),
+    // 8
     B_BISHOP((byte)1, BLACK, 'b'),
+    // 3
     W_ROOK((byte)2, WHITE, 'R'),
+    // 9
     B_ROOK((byte)2, BLACK, 'r'),
+    // 4
     W_QUEEN((byte)3, WHITE, 'Q'),
+    // 10
     B_QUEEN((byte)3, BLACK, 'q'),
+    // 5
     W_KNIGHT((byte)4, WHITE, 'N'),
+    // 11
     B_KNIGHT((byte)4, BLACK, 'n'),
+    // -1
     OUT((byte)-1, '-'),
-    EMP((byte)0, ' ');
+    // 0
+    EMP((byte)0, '.');
 
     public final byte code;
     public final char name;
@@ -35,5 +47,10 @@ public enum Piece {
 
     public Color getColor() {
         return code <= 6 ? WHITE : BLACK;
+    }
+
+    @Override
+    public String toString() {
+        return "" + name;
     }
 }
