@@ -1,5 +1,7 @@
 package ru.pflb.perft;
 
+import ru.pflb.perft.exception.NotImplementedException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -300,9 +302,8 @@ public class Board {
      */
     public boolean isLegal() {
 
-        return true;
 //        // TODO - реализовать курсанту
-//        throw new NotImplementedException();
+        throw new NotImplementedException();
     }
 
     @Override
