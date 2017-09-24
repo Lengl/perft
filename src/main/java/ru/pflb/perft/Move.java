@@ -5,17 +5,17 @@ package ru.pflb.perft;
  */
 public class Move {
 
-    public final Square from, to;
-
     public final Piece piece;
 
     public final Piece capture;
 
-    public Move(Square from, Square to, Piece piece) {
+    public final byte from, to;
+
+    public Move(byte from, byte to, Piece piece) {
         this(from, to, piece, null);
     }
 
-    public Move(Square from, Square to, Piece piece, Piece capture) {
+    public Move(byte from, byte to, Piece piece, Piece capture) {
         this.from = from;
         this.to = to;
         this.piece = piece;

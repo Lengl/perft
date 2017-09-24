@@ -33,14 +33,9 @@ public class Board {
     /* Очередь хода */
     private Color sideToMove = WHITE;
 
-    private Square[][] piecePos = new Square[TOTAL_PIECE_TYPES][MAX_PER_TYPE];
+    private byte[][] piecePos = new byte[TOTAL_PIECE_TYPES][MAX_PER_TYPE];
 
     public Board(String fen) {
-        for (Square[] squares : piecePos) {
-            for (int i = 0; i < squares.length; i++) {
-                squares[i] = Square.invalid();
-            }
-        }
 
         String[] fenParts = fen.split("\\s");
         sideToMove = fenParts[1].startsWith("w") ? WHITE : BLACK;
@@ -50,13 +45,13 @@ public class Board {
             switch (c) {
                 case 'K':
                     mailbox120[square] = W_KING;
-                    piecePos[W_KING.code][0] = new Square(square);
+                    piecePos[W_KING.code][0] = square;
                     break;
                 case 'R':
                     mailbox120[square] = W_ROOK;
                     for (int i = 0; i < piecePos[W_ROOK.code].length; i++) {
-                        if (!piecePos[W_ROOK.code][i].isValid()) {
-                            piecePos[W_ROOK.code][i] = new Square(square);
+                        if (piecePos[W_ROOK.code][i] == 0) {
+                            piecePos[W_ROOK.code][i] = square;
                             break;
                         }
                     }
@@ -64,8 +59,8 @@ public class Board {
                 case 'B':
                     mailbox120[square] = W_BISHOP;
                     for (int i = 0; i < piecePos[W_BISHOP.code].length; i++) {
-                        if (!piecePos[W_BISHOP.code][i].isValid()) {
-                            piecePos[W_BISHOP.code][i] = new Square(square);
+                        if (piecePos[W_BISHOP.code][i] == 0) {
+                            piecePos[W_BISHOP.code][i] = square;
                             break;
                         }
                     }
@@ -73,8 +68,8 @@ public class Board {
                 case 'Q':
                     mailbox120[square] = W_QUEEN;
                     for (int i = 0; i < piecePos[W_QUEEN.code].length; i++) {
-                        if (!piecePos[W_QUEEN.code][i].isValid()) {
-                            piecePos[W_QUEEN.code][i] = new Square(square);
+                        if (piecePos[W_QUEEN.code][i] == 0) {
+                            piecePos[W_QUEEN.code][i] = square;
                             break;
                         }
                     }
@@ -82,21 +77,21 @@ public class Board {
                 case 'N':
                     mailbox120[square] = W_KNIGHT;
                     for (int i = 0; i < piecePos[W_KNIGHT.code].length; i++) {
-                        if (!piecePos[W_KNIGHT.code][i].isValid()) {
-                            piecePos[W_KNIGHT.code][i] = new Square(square);
+                        if (piecePos[W_KNIGHT.code][i] == 0) {
+                            piecePos[W_KNIGHT.code][i] = square;
                             break;
                         }
                     }
                     break;
                 case 'k':
                     mailbox120[square] = B_KING;
-                    piecePos[B_KING.code][0] = new Square(square);
+                    piecePos[B_KING.code][0] = square;
                     break;
                 case 'r':
                     mailbox120[square] = B_ROOK;
                     for (int i = 0; i < piecePos[B_ROOK.code].length; i++) {
-                        if (!piecePos[B_ROOK.code][i].isValid()) {
-                            piecePos[B_ROOK.code][i] = new Square(square);
+                        if (piecePos[B_ROOK.code][i] == 0) {
+                            piecePos[B_ROOK.code][i] = square;
                             break;
                         }
                     }
@@ -104,8 +99,8 @@ public class Board {
                 case 'b':
                     mailbox120[square] = B_BISHOP;
                     for (int i = 0; i < piecePos[B_BISHOP.code].length; i++) {
-                        if (!piecePos[B_BISHOP.code][i].isValid()) {
-                            piecePos[B_BISHOP.code][i] = new Square(square);
+                        if (piecePos[B_BISHOP.code][i] == 0) {
+                            piecePos[B_BISHOP.code][i] = square;
                             break;
                         }
                     }
@@ -113,8 +108,8 @@ public class Board {
                 case 'q':
                     mailbox120[square] = B_QUEEN;
                     for (int i = 0; i < piecePos[B_QUEEN.code].length; i++) {
-                        if (!piecePos[B_QUEEN.code][i].isValid()) {
-                            piecePos[B_QUEEN.code][i] = new Square(square);
+                        if (piecePos[B_QUEEN.code][i] == 0) {
+                            piecePos[B_QUEEN.code][i] = square;
                             break;
                         }
                     }
@@ -122,8 +117,8 @@ public class Board {
                 case 'n':
                     mailbox120[square] = B_KNIGHT;
                     for (int i = 0; i < piecePos[B_KNIGHT.code].length; i++) {
-                        if (!piecePos[B_KNIGHT.code][i].isValid()) {
-                            piecePos[B_KNIGHT.code][i] = new Square(square);
+                        if (piecePos[B_KNIGHT.code][i] == 0) {
+                            piecePos[B_KNIGHT.code][i] = square;
                             break;
                         }
                     }
@@ -186,19 +181,19 @@ public class Board {
         // итерация по всем дальнобойным фигурам
         for (Piece piece : sideToMove == WHITE ? whiteSliders : blackSliders) {
 
-            Square[] squares = piecePos[piece.code];
-            for (Square from : squares) {
-                if (!from.isValid()) {
+            byte[] squares = piecePos[piece.code];
+            for (byte from : squares) {
+                if (from == 0) {
                     break;
                 }
                 for (byte offset : PIECE_OFFSETS[piece.code]) {
                     byte to;
-                    for (to = (byte) (from.value + offset); mailbox120[to] == EMP; to += offset) {
-                        moves.add(new Move(from, new Square(to), piece));
+                    for (to = (byte) (from + offset); mailbox120[to] == EMP; to += offset) {
+                        moves.add(new Move(from, to, piece));
                     }
                     // для вражеских фигур генерируем взятия
                     if (mailbox120[to] != OUT && mailbox120[to].getColor() != sideToMove) {
-                        moves.add(new Move(from, new Square(to), piece, mailbox120[to]));
+                        moves.add(new Move(from, to, piece, mailbox120[to]));
                     }
                 }
             }
@@ -209,18 +204,18 @@ public class Board {
                 blackKN = {B_KING, B_KNIGHT};
         for (Piece piece : sideToMove == WHITE ? whiteKN : blackKN) {
 
-            Square[] squares = piecePos[piece.code];
-            for (Square from : squares) {
-                if (!from.isValid()) {
+            byte[] squares = piecePos[piece.code];
+            for (byte from : squares) {
+                if (from == 0) {
                     break;
                 }
                 for (byte offset : PIECE_OFFSETS[piece.code]) {
-                    byte to = (byte) (from.value + offset);
+                    byte to = (byte) (from + offset);
                     if (mailbox120[to] == EMP) {
-                        moves.add(new Move(from, new Square(to), piece));
+                        moves.add(new Move(from, to, piece));
                     } else if (mailbox120[to] != OUT && mailbox120[to].getColor() != sideToMove) {
                         // для вражеских фигур генерируем взятия
-                        moves.add(new Move(from, new Square(to), piece, mailbox120[to]));
+                        moves.add(new Move(from, to, piece, mailbox120[to]));
                     }
                 }
             }
@@ -232,34 +227,34 @@ public class Board {
     public void makeMove(Move move) {
 
         // перемещаем фигуру на новое поле
-        mailbox120[move.to.value] = move.piece;
+        mailbox120[move.to] = move.piece;
 
-        //TODO: ЗДЕСЬ БЫЛА (и есть?) БАГА
-        // блоки стояли в порядке (2) -> (1)
-        // но блок (2) изменяет объект! Т.к. move.from - ссылка на объект из piecePos!!
-        // и вообще говоря изменяя его, мы теряем информацию о том, где была фигура
-        // решение - при генерации Move-а, класть в него не ссылку from (не ссылку на Square), а новый Square,
-        // который и будет хранить "где была фигура", и не будет перетираться.
-
-        // (1) удаляем ходящую фигуру с предыдущего поля
-        mailbox120[move.from.value] = EMP;
-
-        // (2) обновляем массив быстрого доступа для ходящей фигуры
-        for (Square square : piecePos[move.piece.code]) {
-            if (square.value == move.from.value) {
-                square.value = move.to.value;
+        // обновляем массив быстрого доступа для ходящей фигуры
+        for (int i = 0; i < MAX_PER_TYPE; i++ ) {
+            if (piecePos[move.piece.code][i] == move.from) {
+                piecePos[move.piece.code][i] = move.to;
+                break;
             }
         }
+
+        // удаляем ходящую фигуру с предыдущего поля
+        mailbox120[move.from] = EMP;
 
         if (move.isCapture()) {
 
             // обновляем массив быстрого доступа для взятой фигуры
-            for (int i = 0; i < piecePos[move.capture.code].length; i++) {
-                for (int j = i + 1; j < piecePos[move.capture.code].length; j++) {
-                    piecePos[move.capture.code][j-1].value = piecePos[move.capture.code][j].value;
-                    if (!piecePos[move.capture.code][j].isValid()) {
-                        break;
+            for (int i = 0; i < MAX_PER_TYPE; i++) {
+                if (piecePos[move.capture.code][i] == move.to) {
+                    // сдвигаем оставшиеся фигуры к началу массива, затирая i-тую
+                    for (int j = i + 1; j < MAX_PER_TYPE; j++) {
+                        piecePos[move.capture.code][j - 1] = piecePos[move.capture.code][j];
+                        if (piecePos[move.capture.code][j] == 0) {
+                            break;
+                        }
                     }
+                    // На случай, если у нас было 10 фигур и стало 9
+                    piecePos[move.capture.code][MAX_PER_TYPE - 1] = 0;
+                    break;
                 }
             }
         }
@@ -272,30 +267,31 @@ public class Board {
     public void takeBack(Move move) {
 
         // возвращаем фигуру на старое поле
-        mailbox120[move.from.value] = move.piece;
+        mailbox120[move.from] = move.piece;
 
         // обновляем массив быстрого доступа для ходящей фигуры
-        for (Square square : piecePos[move.piece.code]) {
-            if (square.value == move.to.value) {
-                square.value = move.from.value;
+        for (int i = 0; i < MAX_PER_TYPE; i++ ) {
+            if (piecePos[move.piece.code][i] == move.to) {
+                piecePos[move.piece.code][i] = move.from;
+                break;
             }
         }
 
         if (move.isCapture()) {
 
             // возвращение взятой фигуры
-            mailbox120[move.to.value] = move.capture;
+            mailbox120[move.to] = move.capture;
 
             // обновляем массив быстрого доступа для взятой фигуры
-            for (int i = 0; i < piecePos[move.capture.code].length; i++) {
-                if (!piecePos[move.capture.code][i].isValid()) {
+            for (int i = 0; i < MAX_PER_TYPE; i++) {
+                if (piecePos[move.capture.code][i] == 0) {
                     piecePos[move.capture.code][i] = move.to;
                     break;
                 }
             }
         } else {
             // пустое поле на месте стоянки фигуры
-            mailbox120[move.to.value] = EMP;
+            mailbox120[move.to] = EMP;
         }
 
         // возврат очереди хода
@@ -311,7 +307,7 @@ public class Board {
      */
     public boolean isLegal() {
         // Проверяем короля стороны противоположной той, чей сейчас ход (т.к. в конце MakeMove мы меняем сторону)
-        byte kingPos = sideToMove == WHITE ? piecePos[B_KING.code][0].value : piecePos[W_KING.code][0].value;
+        byte kingPos = sideToMove == WHITE ? piecePos[B_KING.code][0] : piecePos[W_KING.code][0];
         byte checkedPos;
         // Проверка горизонталей и вертикалей в каждом направлении смещения
         for (byte offset : LINE_OFFSETS) {
