@@ -53,4 +53,12 @@ public enum Piece {
     public String toString() {
         return "" + name;
     }
+
+    public boolean isKing() { return (code % 6) == 1; }
+    public boolean isBishop() { return (code % 6) == 2; }
+    public boolean isRook() { return (code % 6) == 3; }
+    public boolean isQueen() { return (code % 6) == 4; }
+    public boolean isKnight() { return ((code % 6) == 5) && code != -1; }
+
+
 }

@@ -1,7 +1,5 @@
 package ru.pflb.perft;
 
-import ru.pflb.perft.exception.NotImplementedException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -236,15 +234,22 @@ public class Board {
         // перемещаем фигуру на новое поле
         mailbox120[move.to.value] = move.piece;
 
-        // обновляем массив быстрого доступа для ходящей фигуры
+        //TODO: ЗДЕСЬ БЫЛА (и есть?) БАГА
+        // блоки стояли в порядке (2) -> (1)
+        // но блок (2) изменяет объект! Т.к. move.from - ссылка на объект из piecePos!!
+        // и вообще говоря изменяя его, мы теряем информацию о том, где была фигура
+        // решение - при генерации Move-а, класть в него не ссылку from (не ссылку на Square), а новый Square,
+        // который и будет хранить "где была фигура", и не будет перетираться.
+
+        // (1) удаляем ходящую фигуру с предыдущего поля
+        mailbox120[move.from.value] = EMP;
+
+        // (2) обновляем массив быстрого доступа для ходящей фигуры
         for (Square square : piecePos[move.piece.code]) {
             if (square.value == move.from.value) {
                 square.value = move.to.value;
             }
         }
-
-        // удаляем ходящую фигуру с предыдущего поля
-        mailbox120[move.from.value] = EMP;
 
         if (move.isCapture()) {
 
@@ -297,13 +302,83 @@ public class Board {
         sideToMove = sideToMove == WHITE ? BLACK : WHITE;
     }
 
+    private static final byte[] LINE_OFFSETS = PIECE_OFFSETS[W_ROOK.code],
+        DIAG_OFFSETS = PIECE_OFFSETS[W_BISHOP.code],
+        KNIGHT_OFFSETS = PIECE_OFFSETS[W_KNIGHT.code];
+
     /**
      * Проверка того, что король стороны, только что сделавшей ход, не находится под шахом.
      */
     public boolean isLegal() {
+        // Проверяем короля стороны противоположной той, чей сейчас ход (т.к. в конце MakeMove мы меняем сторону)
+        byte kingPos = sideToMove == WHITE ? piecePos[B_KING.code][0].value : piecePos[W_KING.code][0].value;
+        byte checkedPos;
+        // Проверка горизонталей и вертикалей в каждом направлении смещения
+        for (byte offset : LINE_OFFSETS) {
+            checkedPos = (byte) (kingPos + offset);
+            // если рядом стоит король - позиция нелегальная
+            if (mailbox120[checkedPos].isKing())
+                return false;
 
-//        // TODO - реализовать курсанту
-        throw new NotImplementedException();
+            while (mailbox120[checkedPos] != OUT) {
+                if ( mailbox120[checkedPos] != EMP ) {
+                    if ( mailbox120[checkedPos].getColor() == sideToMove &&
+                            ( mailbox120[checkedPos].isQueen() || mailbox120[checkedPos].isRook() )
+                            ) {
+                        /* Король под шахом, если он под ударом дальнобойной горизонтальной фигуры того цвета
+                         * чей ход будет сейчас
+                         */
+                        return false;
+                    } else {
+                        /* мы встретили фигуру своего цвета ИЛИ фигура другого цвета - не линейная дальнобойная,
+                         * эта половина линии не опасна
+                         */
+                        break;
+                    }
+                }
+                // иначе клетка пуста и мы смотрим следующую в этом направлении
+                checkedPos += offset;
+            }
+        }
+        // Проверка диагоналей в каждом направлении смещения
+        for (byte offset : DIAG_OFFSETS) {
+            checkedPos = (byte) (kingPos + offset);
+            // если рядом стоит король - позиция нелегальная
+            if (mailbox120[checkedPos].isKing())
+                return false;
+
+            while ( mailbox120[checkedPos] != OUT ) {
+                if ( mailbox120[checkedPos] != EMP ) {
+                    if ( mailbox120[checkedPos].getColor() == sideToMove &&
+                            ( mailbox120[checkedPos].isQueen() || mailbox120[checkedPos].isBishop() )
+                            ) {
+                        /* Король под шахом, если он под ударом дальнобойной диагональной фигуры того цвета
+                         * чей ход будет сейчас
+                         */
+                        return false;
+                    } else {
+                        /* мы встретили фигуру своего цвета ИЛИ фигура другого цвета - не горизонтальная дальнобойная,
+                         * эта диагональ не опасна
+                         */
+                        break;
+                    }
+                }
+                // иначе клетка пуста и мы смотрим следующую в этом направлении
+                checkedPos += offset;
+            }
+        }
+        // Проверка на шах от коня
+        // в каждом направлении смещения
+        for (byte offset : KNIGHT_OFFSETS) {
+            // в каждом направлении смещения
+            checkedPos = (byte) (kingPos + offset);
+            // если стоит конь другого цвета - то король под шахом (проверка, что поле пустое или за пределами - не нужна)
+            if ( mailbox120[checkedPos].getColor() == sideToMove && mailbox120[checkedPos].isKnight() ) {
+                return false;
+            }
+        }
+        // Мы проверили все фигуры, позиция легальна
+        return true;
     }
 
     @Override
